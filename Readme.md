@@ -12,6 +12,8 @@ This project is a website to complete my take home test as python developer. In 
 - Authentication
 - Migration Database 
 - Django lifecycle
+- Reusable template
+- Pagination
 
 ## Technology 
 - Python 

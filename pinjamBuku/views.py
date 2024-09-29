@@ -5,14 +5,21 @@ from django.urls import reverse
 
 from .models import TransactionBorrowBook, Book, Borrower
 from datetime import datetime, timedelta
+from django.core.paginator import Paginator
 
 
 def index(request):
     if request.user.is_authenticated:
         transactions_borrow_book = TransactionBorrowBook.objects.select_related('book').select_related('borrower').exclude(status='cancel')
+        pagination = Paginator(transactions_borrow_book,5)
+        page_number = request.GET.get("page")
+        if page_number is None:
+            page_number = 1
+        page = pagination.page(page_number)
+
         dateNow = datetime.today()
         context = {
-            "transactions_borrow_book" : transactions_borrow_book,
+            "page" : page,
             "dateNow": dateNow
         }
         # for transaction in transactions_borrow_book:
@@ -24,10 +31,11 @@ def index(request):
 
 def update_status_transaction(request):
     transaction_id = request.POST['id']
+    page_number = request.POST['page_number']
     status = request.POST['status']
     transaction = TransactionBorrowBook.objects.filter(pk=transaction_id).update(status=status)
 
-    return redirect("/pinjamBuku/")
+    return redirect(f"/pinjamBuku/?page={page_number}")
 
 def add_transaction(request):
     if request.method == 'POST':
