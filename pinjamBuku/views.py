@@ -15,9 +15,9 @@ def index(request):
             filter_status = 'all'
         
         if filter_status == 'all':
-            transactions_borrow_book = TransactionBorrowBook.objects.select_related('book').select_related('borrower').exclude(status='cancel')
+            transactions_borrow_book = TransactionBorrowBook.objects.select_related('book').select_related('borrower').exclude(status='cancel').order_by('borrow_date')
         else:
-            transactions_borrow_book = TransactionBorrowBook.objects.select_related('book').select_related('borrower').filter(status=filter_status).exclude(status='cancel')
+            transactions_borrow_book = TransactionBorrowBook.objects.select_related('book').select_related('borrower').filter(status=filter_status).exclude(status='cancel').order_by('borrow_date')
         pagination = Paginator(transactions_borrow_book,5)
 
         page_number = request.GET.get("page")
