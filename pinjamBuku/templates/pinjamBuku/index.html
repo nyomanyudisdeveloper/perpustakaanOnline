@@ -9,6 +9,14 @@
       href="{% static 'perpustakaanOnline/output.css' %}?v={{ timestamp }}"
       rel="stylesheet"
     />
+    <script>
+      function handleSelectStatusChange() {
+          const selectedValue = document.getElementById('filterStatus').value;
+          if(selectedValue){
+            window.location.href = `/pinjamBuku/?filter_status=${selectedValue}`;
+          }
+      }
+    </script>
   </head>
   <body>
     {% include "pinjamBuku/header.html"%}
@@ -16,21 +24,41 @@
       <h1 class="text-3xl font-bold">Table List Transaction Borrow Book</h1>
       <a href="{% url 'pinjamBuku:addTransaction'%}" class="bg-green-600 p-2 rounded-md text-white hover:cursor-pointer">Add Transaction</a>
     </div>
-    <div class="mt-3 mx-10 flex-row-reverse">
-      <span class="step-links">
-          <span class="current">
+    <div class="mt-3 mx-10 flex justify-between">
+      <span >
+          <span >
               Page {{ page.number }} of {{ page.paginator.num_pages }}
           </span>
           {% if page.has_previous %}
               <!-- <a href="?page=1">&laquo; first</a> -->
-              <a class="text-blue-700 underline" href="?page={{ page.previous_page_number }}"> < previous</a>
+               {% if filter_status %}
+                <a class="text-blue-700 underline" href="?page={{ page.previous_page_number }}&filter_status={{ filter_status }}"> < previous</a>
+                {% else %}
+                <a class="text-blue-700 underline" href="?page={{ page.previous_page_number }}"> < previous</a>
+               {% endif %}
+              
           {% endif %}
 
           {% if page.has_next %}
-              <a class="text-blue-700 underline" href="?page={{ page.next_page_number }}">next ></a>
+              {% if filter_status %}
+                <a class="text-blue-700 underline" href="?page={{ page.next_page_number }}&filter_status={{ filter_status }}">next ></a>
+                {% else %}
+                <a class="text-blue-700 underline" href="?page={{ page.next_page_number }}">next ></a>
+              {% endif %}
               <!-- <a href="?page={{ page.paginator.num_pages }}">last &raquo;</a> -->
           {% endif %}
       </span>
+      <select
+        id="filterStatus"
+        onchange="handleSelectStatusChange()"
+        class="block w-fit rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:max-w-xs sm:text-sm sm:leading-6"
+      >
+       <option {% if filter_status == "all" %}Selected {%endif%}   value="all">All Status</option>
+       <option {% if filter_status == "still borrowed" %}Selected {%endif%}  value="still borrowed">still borrowed</option>
+       <option {% if filter_status == "returned" %}Selected {%endif%}  value="returned">returned</option>
+       <option {% if filter_status == "cancel" %}Selected {%endif%}  value="cancel">cancel</option>
+       <option {% if filter_status == "penalty" %}Selected {%endif%}  value="penalty">penalty</option>
+      </select>
   </div>
     <div class="overflow-x-auto mx-10 mt-2">
       <table class="min-w-full bg-white border border-gray-200">

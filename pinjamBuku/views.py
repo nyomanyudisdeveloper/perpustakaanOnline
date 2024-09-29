@@ -10,8 +10,16 @@ from django.core.paginator import Paginator
 
 def index(request):
     if request.user.is_authenticated:
-        transactions_borrow_book = TransactionBorrowBook.objects.select_related('book').select_related('borrower').exclude(status='cancel')
+        filter_status = request.GET.get("filter_status")
+        if filter_status is None:
+            filter_status = 'all'
+        
+        if filter_status == 'all':
+            transactions_borrow_book = TransactionBorrowBook.objects.select_related('book').select_related('borrower').exclude(status='cancel')
+        else:
+            transactions_borrow_book = TransactionBorrowBook.objects.select_related('book').select_related('borrower').filter(status=filter_status).exclude(status='cancel')
         pagination = Paginator(transactions_borrow_book,5)
+
         page_number = request.GET.get("page")
         if page_number is None:
             page_number = 1
@@ -20,11 +28,9 @@ def index(request):
         dateNow = datetime.today()
         context = {
             "page" : page,
+            "filter_status" : filter_status,
             "dateNow": dateNow
         }
-        # for transaction in transactions_borrow_book:
-        #     return HttpResponse(transaction.book.name)
-        # return HttpResponse(transactions_borrow_book)
         return render(request, "pinjamBuku/index.html", context)
     else:
         return redirect("/accounts/login/")
@@ -63,8 +69,8 @@ def add_transaction(request):
             context = { 
                 "list_book" : list_book, 
                 "list_borrower": list_borrower,
-                "bookid": book,
-                "borrowerid": borrower, 
+                "bookid": int(book),
+                "borrowerid": int(borrower), 
                 "returnDate": returnDate, 
                 "error_borrower_list": error_borrower_list,
                 "error_return_date_list": error_return_date_list
