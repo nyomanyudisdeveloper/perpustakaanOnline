@@ -1,0 +1,4 @@
+python manage.py runserver 
+npx tailwindcss -i ./perpustakaanOnline/static/perpustakaanOnline/input.css -o ./perpustakaanOnline/static/perpustakaanOnline//output.css --watch
+python manage.py makemigrations polls
+python manage.py sqlmigrate pinjamBuku 0003

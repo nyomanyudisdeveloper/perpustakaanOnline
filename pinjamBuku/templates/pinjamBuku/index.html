@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>List Transaction Borrow Book</title>
+    {% load static %}
+    <link
+      href="{% static 'perpustakaanOnline/output.css' %}?v={{ timestamp }}"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
+    {% include "pinjamBuku/header.html"%}
+    <div class="mx-10 flex justify-between mt-5">
+      <h1 class="text-3xl font-bold">Table List Transaction Borrow Book</h1>
+      <a href="{% url 'pinjamBuku:addTransaction'%}" class="bg-green-600 p-2 rounded-md text-white hover:cursor-pointer">Add Transaction</a>
+    </div>
+    <div class="overflow-x-auto mx-10 mt-5">
+      <table class="min-w-full bg-white border border-gray-200">
+        <thead>
+          <tr class="bg-gray-200">
+            <th class="py-2 px-4 border-b text-left">Borrower</th>
+            <th class="py-2 px-4 border-b text-left">Book Name</th>
+            <th class="py-2 px-4 border-b text-left">Start Borrow Date</th>
+            <th class="py-2 px-4 border-b text-left">Deadline Return Date</th>
+            <th class="py-2 px-4 border-b text-left">Status</th>
+            <th class="py-2 px-4 border-b text-left">Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% if transactions_borrow_book %}
+            {% for transaction in transactions_borrow_book %}
+            <tr>
+              <td class="py-2 px-4 border-b">{{ transaction.borrower.full_name }}</td>
+              <td class="py-2 px-4 border-b">{{ transaction.book.name }}</td>
+              <td class="py-2 px-4 border-b">{{ transaction.borrow_date }}</td>
+              <td class="py-2 px-4 border-b">{{ transaction.returned_date }}</td>
+              <td class="py-2 px-4 border-b">{% if transaction.is_past_deadline %} Past Deadline  {% else %} {{ transaction.status }}  {% endif %}</td>
+              <td class="py-2 px-4 border-b">
+                
+                {% if transaction.is_past_deadline  %}
+                  <form method="POST" action="{% url 'pinjamBuku:updateStatusTransaction'%}">
+                      {% csrf_token %}
+                      <input type="hidden" name="status" value="penalty" />
+                      <input type="hidden" name="id" value="{{ transaction.id }}" />
+                      <input class="bg-red-300 p-2 rounded-md hover:cursor-pointer mt-2" type="submit" value="Pay Penalty" />
+                  </form>
+                  <form method="POST" action="{% url 'pinjamBuku:updateStatusTransaction'%}">
+                    {% csrf_token %}
+                    <input type="hidden" name="status" value="cancel" />
+                    <input type="hidden" name="id" value="{{ transaction.id }}" />
+                    <input class="bg-red-300 p-2 rounded-md hover:cursor-pointer mt-2" type="submit" value="Cancel" />
+                  </form>
+                  {% elif transaction.status != 'returned' %}
+                  <form method="POST" action="{% url 'pinjamBuku:updateStatusTransaction'%}">
+                    {% csrf_token %}
+                    <input type="hidden" name="status" value="returned" />
+                    <input type="hidden" name="id" value="{{ transaction.id }}" />
+                    <input class="bg-green-300 p-2 rounded-md hover:cursor-pointer" type="submit" value="Return" />
+                  </form>
+                  <form method="POST" action="{% url 'pinjamBuku:updateStatusTransaction'%}">
+                    {% csrf_token %}
+                    <input type="hidden" name="status" value="cancel" />
+                    <input type="hidden" name="id" value="{{ transaction.id }}" />
+                    <input class="bg-red-300 p-2 rounded-md hover:cursor-pointer mt-2" type="submit" value="Cancel" />
+                  </form>
+                {% endif %}
+                
+              </td>
+            </tr>
+            {% endfor %} 
+          {% else %}
+          <tr>
+            <td class="py-2 px-4 border-b text-center" colspan="5">No data available, try create new transaction</td>
+          </tr>
+          {% endif %}
+          <!-- <tr>
+            <td class="py-2 px-4 border-b">1</td>
+            <td class="py-2 px-4 border-b">Alice</td>
+            <td class="py-2 px-4 border-b">alice@example.com</td>
+            <td class="py-2 px-4 border-b">Admin</td>
+          </tr>
+          <tr class="bg-gray-100">
+            <td class="py-2 px-4 border-b">2</td>
+            <td class="py-2 px-4 border-b">Bob</td>
+            <td class="py-2 px-4 border-b">bob@example.com</td>
+            <td class="py-2 px-4 border-b">User</td>
+          </tr>
+          <tr>
+            <td class="py-2 px-4 border-b">3</td>
+            <td class="py-2 px-4 border-b">Charlie</td>
+            <td class="py-2 px-4 border-b">charlie@example.com</td>
+            <td class="py-2 px-4 border-b">User</td>
+          </tr> -->
+        </tbody>
+      </table>
+    </div>
+  </body>
+</html>
