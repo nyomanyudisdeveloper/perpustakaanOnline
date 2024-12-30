@@ -26,7 +26,7 @@ SECRET_KEY = "django-insecure-t64xq44*td2$eu#nnva1sal=o(5x!6ixlt4wi=cc%nfi86b&l8
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['.vercel.app','127.0.0.1']
 
 
 
@@ -54,9 +54,13 @@ MIDDLEWARE = [
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
+    # "accounts.middleware.LoginRequireMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
+
 ]
+
+LOGIN_URL = "/accounts/login/"
 
 ROOT_URLCONF = "perpustakaanOnline.urls"
 

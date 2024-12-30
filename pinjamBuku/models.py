@@ -7,6 +7,7 @@ class Book(models.Model):
     author = models.CharField(max_length=200)
     genre = models.CharField(max_length=50)
     quantity = models.IntegerField(default=1)
+    status = models.CharField(max_length=20, default= "active")
 
     def __str__(self):
         return self.name
@@ -16,6 +17,7 @@ class Borrower(models.Model):
     identity_number = models.CharField(max_length=50)
     birth_date = models.DateField()
     home_place = models.CharField(max_length=200)
+    status = models.CharField(max_length=20, default= "active")
 
     def __str__(self):
         return self.full_name

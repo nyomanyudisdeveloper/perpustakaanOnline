@@ -26,8 +26,35 @@ def index(request):
         page = pagination.page(page_number)
 
         dateNow = datetime.today()
+        list_table_detail = []
+        for transaction in page.object_list:
+            temp_list = []
+            temp_list.append(transaction.borrower.full_name)
+            temp_list.append(transaction.book.name)
+            temp_list.append(transaction.borrow_date)
+            temp_list.append(transaction.returned_date)
+            status = ""
+            if transaction.is_past_deadline and transaction.status != "returned"  and transaction.status != "penalty":  
+                status = "Past Deadline"  
+            else:
+                status = transaction.status  
+            temp_list.append(status)
+            temp_list.append({
+                "id":transaction.id,
+                "status":status
+            })
+            print("type = ",type({
+                "id":transaction.id,
+                "status":status
+            }))
+            list_table_detail.append(temp_list)
+        
+            
+        list_table_header = ['Borrower','Book Name','Start Borrow Date','Deadline Return Date','Status','Action']
         context = {
             "page" : page,
+            "list_table_detail": list_table_detail,
+            "list_table_header": list_table_header,
             "filter_status" : filter_status,
             "dateNow": dateNow
         }
@@ -35,10 +62,53 @@ def index(request):
     else:
         return redirect("/accounts/login/")
 
+def book(request):
+    if request.user.is_authenticated:
+        list_book = Book.objects.all().exclude(status="deleted")
+        list_table_header = ["Book Name","Author","Genre","Quantity","Action"]
+
+        pagination = Paginator(list_book,5)
+        page_number = request.GET.get("page")
+        if page_number is None:
+            page_number = 1
+        page = pagination.page(page_number)
+
+        list_table_detail = []
+        for book in page.object_list:
+            list_temp = []
+            list_temp.append(book.name)
+            list_temp.append(book.author)
+            list_temp.append(book.genre)
+            list_temp.append(book.quantity)
+            list_temp.append({
+                "id":book.id
+            })
+            list_table_detail.append(list_temp)
+
+        context = {
+            "page" : page,
+            "list_table_header": list_table_header,
+            "list_table_detail": list_table_detail
+        }
+        return render(request,"pinjamBuku/book.html",context)
+    else:
+        return redirect("/accounts/login/")
+    
+def update_status_book(request):
+    # if request.user.is_authenticated:
+    book_id = request.POST['id']
+    page_number = request.POST['page_number']
+    print("book_id = ",book_id)
+    print("page_number = ",page_number)
+
+    book = Book.objects.filter(pk=book_id).update(status="deleted")
+    return redirect(f"/pinjamBuku/book/?page={page_number}") 
+
 def update_status_transaction(request):
     transaction_id = request.POST['id']
     page_number = request.POST['page_number']
     status = request.POST['status']
+
     transaction = TransactionBorrowBook.objects.filter(pk=transaction_id).update(status=status)
 
     return redirect(f"/pinjamBuku/?page={page_number}")

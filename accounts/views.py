@@ -3,6 +3,7 @@ from django.urls import reverse
 from django.contrib.auth import authenticate, logout, get_user_model, login
 from django.contrib.auth.models import User
 from django.http import HttpResponseRedirect, HttpResponse
+from django.conf import settings
 # Create your views here.
 
 def login_process(request):
@@ -22,8 +23,6 @@ def login_process(request):
         else:
             return render(request,'login.html',{'error':'Email or password is incorrect','email':email,'password':password})
     else:
-        if request.user.is_authenticated:
-            return redirect("/pinjamBuku/")
         return render(request,"login.html");
 
 def register(request):
@@ -88,5 +87,5 @@ def register(request):
 
 def logout_process(request):
     logout(request)
-    return redirect("/accounts/login/")
+    return redirect(settings.LOGIN_URL)
     

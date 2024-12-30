@@ -1,0 +1,75 @@
+<div class="overflow-x-auto mx-10 mt-2">
+    <table class="min-w-full bg-white border border-gray-200">
+      <thead>
+        <tr class="bg-gray-200">
+          {% for tableHeader in list_table_header %}
+            <th class="py-2 px-4 border-b text-left">{{ tableHeader }}</th>
+          {% endfor %}
+        </tr>
+      </thead>
+      <tbody>
+        {% if page %}
+          {% for list_detail in list_table_detail %}
+            <tr>
+                {% for detail in list_detail %}
+                    {% if detail.id is None %}
+                        <td class="py-2 px-4 border-b">{{ detail }}</td>
+                        {% else %}
+                            {% if is_Home_Page %}
+                                <td class="py-2 px-4 border-b">
+                                    {% if detail.status == "Past Deadline"  %}
+                                        <form method="POST" action="{% url 'pinjamBuku:updateStatusTransaction'%}">
+                                            {% csrf_token %}
+                                            <input type="hidden" name="page_number" value="{{ page.number }}" />
+                                            <input type="hidden" name="status" value="penalty" />
+                                            <input type="hidden" name="id" value="{{ detail.id }}" />
+                                            <input class="bg-red-300 p-2 rounded-md hover:cursor-pointer mt-2" type="submit" value="Pay Penalty" />
+                                        </form>
+                                        <form method="POST" action="{% url 'pinjamBuku:updateStatusTransaction'%}">
+                                            {% csrf_token %}
+                                            <input type="hidden" name="page_number" value="{{ page.number }}" />
+                                            <input type="hidden" name="status" value="cancel" />
+                                            <input type="hidden" name="id" value="{{ detail.id }}" />
+                                            <input class="bg-red-300 p-2 mt-3 rounded-md hover:cursor-pointer" type="submit" value="Cancel" />
+                                        </form>
+                                        {% elif detail.status != 'returned' and detail.status != "penalty" %}
+                                        <form method="POST" action="{% url 'pinjamBuku:updateStatusTransaction'%}">
+                                            {% csrf_token %}
+                                            <input type="hidden" name="page_number" value="{{ page.number }}" />
+                                            <input type="hidden" name="status" value="returned" />
+                                            <input type="hidden" name="id" value="{{ detail.id }}" />
+                                            <input class="bg-green-300 p-2 rounded-md hover:cursor-pointer" type="submit" value="Return" />
+                                        </form>
+                                        <form method="POST" action="{% url 'pinjamBuku:updateStatusTransaction'%}">
+                                            {% csrf_token %}
+                                            <input type="hidden" name="page_number" value="{{ page.number }}" />
+                                            <input type="hidden" name="status" value="cancel" />
+                                            <input type="hidden" name="id" value="{{ detail.id }}" />
+                                            <input class="bg-red-300 p-2 mt-3 rounded-md hover:cursor-pointer" type="submit" value="Cancel" />
+                                        </form>
+                                    {% endif %}
+                                </td>
+                            {% endif %}
+                            {% if is_book_page %}
+                                <td class="py-2 px-4 border-b">
+                                    <form method="POST" action="{% url 'pinjamBuku:updateStatusBook'%}">
+                                        {% csrf_token %}
+                                        <input type="hidden" name="page_number" value="{{ page.number }}" />
+                                        <input type="hidden" name="status" value="deleted" />
+                                        <input type="hidden" name="id" value="{{ detail.id }}" />
+                                        <input class="bg-red-300 p-2 rounded-md hover:cursor-pointer mt-2" type="submit" value="Delete" />
+                                    </form>
+                                </td>
+                            {% endif %}
+                    {% endif %}
+                {% endfor %}
+            </tr>
+          {% endfor %} 
+        {% else %}
+        <tr>
+          <td class="py-2 px-4 border-b text-center" colspan="5">No data available, try create new transaction</td>
+        </tr>
+        {% endif %}
+      </tbody>
+    </table>
+  </div>
